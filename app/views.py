@@ -1,6 +1,6 @@
 from django.shortcuts import render
 
-#Developer 1 Views:
+#First student's tasks:
 class UserCreateView():
     pass
 
@@ -19,7 +19,7 @@ class TasksCreatedByUser():
 class TaskWithExecutorAPIView():
     pass
 
-#Developer 2 Views:
+#Second student's tasks:
 class UserTasksAPIView():
     pass
 
