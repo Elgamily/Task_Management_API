@@ -2,6 +2,8 @@ from django.shortcuts import render
 from requests import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
+from .models import *
+from .serializers import *
 
 #First student's tasks:
 class UserCreateView():
