@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from requests import Response
+from django.contrib.auth.models import User
 
 #First student's tasks:
 class UserCreateView():
@@ -34,3 +36,9 @@ class BecomeExecutorAPIView():
 
 class MarkTaskDoneAPIView():
     pass
+
+class ClearDatabaseView(APIView):
+    def post(self, request):
+        Task.objects.all().delete()
+        User.objects.all().delete()
+        return Response({'message': 'All data cleared successfully'}, status=200)
