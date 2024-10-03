@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 from requests import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
+from rest_framework import status
 from .models import *
 from .serializers import *
 
@@ -80,8 +82,30 @@ class UnassignedTasksAPIView(ListAPIView):
         # Return tasks where executor is None and sorted by cost in ascending order
         return Task.objects.filter(executor__isnull=True).order_by('cost')
 
-class BecomeExecutorAPIView():
-    pass
+class BecomeExecutorAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, task_id, *args, **kwargs):
+        user = request.user
+
+        # Get the task by id or return 404 if not found
+        task = get_object_or_404(Task, id=task_id)
+
+        # Check if the current user is the creator of the task
+        if task.creator == user:
+            return Response({'error': 'You cannot assign yourself as executor of your own task'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the task already has an executor
+        if task.executor is not None:
+            return Response({'error': 'This task already has an executor'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Assign the current user as the executor
+        task.executor = user
+
+        # Save the task
+        task.save()
+
+        return Response({'message': 'You have been assigned as the executor of the task'}, status=status.HTTP_200_OK)
 
 class MarkTaskDoneAPIView():
     pass
