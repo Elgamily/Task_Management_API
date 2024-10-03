@@ -107,8 +107,26 @@ class BecomeExecutorAPIView(APIView):
 
         return Response({'message': 'You have been assigned as the executor of the task'}, status=status.HTTP_200_OK)
 
-class MarkTaskDoneAPIView():
-    pass
+class MarkTaskDoneAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def patch(self, request, task_id, *args, **kwargs):
+        user = request.user
+
+        # Get the task by id or return 404 if not found
+        task = get_object_or_404(Task, id=task_id)
+
+        # Check if the current user is the executor of the task
+        if task.executor != user:
+            return Response({'error': 'You are not authorized to mark this task as done'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Mark the task as done
+        task.is_done = True
+        task.save()
+
+        # Serialize the task and return the response
+        serializer = TaskSerializer(task)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class ClearDatabaseView(APIView):
     def post(self, request):
