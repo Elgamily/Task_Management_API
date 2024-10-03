@@ -85,7 +85,7 @@ class UnassignedTasksAPIView(ListAPIView):
 class BecomeExecutorAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def patch(self, request, task_id, *args, **kwargs):
+    def patch(self, request, task_id):
         user = request.user
 
         # Get the task by id or return 404 if not found
