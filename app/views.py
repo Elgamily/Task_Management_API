@@ -2,6 +2,8 @@ from django.shortcuts import render
 from requests import Response
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.generics import ListAPIView
 from .models import *
 from .serializers import *
 
@@ -26,7 +28,11 @@ class TaskWithExecutorAPIView():
 
 #Second student's tasks:
 class UserTasksAPIView():
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        return Task.objects.filter(executor=self.request.user)
 
 class UserTasksStatsAPIView():
     pass
