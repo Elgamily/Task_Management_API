@@ -73,7 +73,12 @@ class UserTasksStatsAPIView(APIView):
         return Response(stats, status=200)
 
 class UnassignedTasksAPIView():
-    pass
+    permission_classes = [IsAuthenticated]
+    serializer_class = TaskSerializer
+
+    def get_queryset(self):
+        # Return tasks where executor is None and sorted by cost in ascending order
+        return Task.objects.filter(executor__isnull=True).order_by('cost')
 
 class BecomeExecutorAPIView():
     pass
