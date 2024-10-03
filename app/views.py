@@ -27,10 +27,11 @@ class TaskWithExecutorAPIView():
     pass
 
 #Second student's tasks:
-class UserTasksAPIView():
+class UserTasksAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
 
+    # Return tasks
     def get_queryset(self):
         return Task.objects.filter(executor=self.request.user)
 
