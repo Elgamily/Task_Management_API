@@ -72,7 +72,7 @@ class UserTasksStatsAPIView(APIView):
 
         return Response(stats, status=200)
 
-class UnassignedTasksAPIView():
+class UnassignedTasksAPIView(ListAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = TaskSerializer
 
