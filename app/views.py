@@ -110,7 +110,7 @@ class TaskCreateView(APIView):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class TasksCreatedByUser():
+class TasksCreatedByUser(APIView):
     #1.
     permission_classes = [IsAuthenticated]
 
@@ -121,7 +121,7 @@ class TasksCreatedByUser():
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-class TaskWithExecutorAPIView():
+class TaskWithExecutorAPIView(APIView):
     def get(self, request, *args, **kwargs):
         tasks = Task.objects.all()
         response_data = []
