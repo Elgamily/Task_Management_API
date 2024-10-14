@@ -67,8 +67,48 @@ class LogoutView(APIView):
         #4
         return Response({'message', 'Successfully logged out'}, status=status.HTTP_200_OK)
 
-class TaskCreateView():
-    pass
+class TaskCreateView(APIView):
+    #2.
+    permission_classes = [IsAuthenticated]
+
+    #1.
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        executor_id = data.get('executor')
+        name = data.get('name')
+        cost = data.get('cost')
+        deadline = data.get('deadline')
+        creator = request.user
+
+        #3.
+        if executor_id and int(executor_id) == creator.id:
+            return Response({'error': 'The creator of a task cannot be its executor'}, status=status.HTTP_400_BAD_REQUEST)
+
+        executor = None
+
+        if executor_id:
+            try:
+                executor = User.objects.get(id=executor_id)
+            except User.DoesNotExist:
+                executor = None
+
+        task_data = {
+            'creator': creator,
+            'executor': executor,
+            'name': name,
+            'cost': cost,
+            'deadline': deadline
+        }
+
+        serializer = TaskSerializer(data=task_data)
+
+        if serializer.is_valid():
+            task = serializer.save()
+            
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TasksCreatedByUser():
     pass
