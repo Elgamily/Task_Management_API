@@ -122,7 +122,20 @@ class TasksCreatedByUser():
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class TaskWithExecutorAPIView():
-    pass
+    def get(self, request, *args, **kwargs):
+        tasks = Task.objects.all()
+        response_data = []
+
+        for task in tasks:
+            executor_name = task.executor.username if task.executor else 'undefined'
+            response_data.append({
+                'executor': executor_name,
+                'name': task.name,
+                'cost': task.cost,
+                'deadline': task.deadline
+            })
+        
+        return Response(response_data, status=status.HTTP_200_OK)
 
 #Second student's tasks:
 class UserTasksAPIView(ListAPIView):
