@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
-from requests import Response
+from django.contrib.auth import authenticate
+from requests import Response, request
 from rest_framework.views import APIView
 from django.contrib.auth.models import User
 from rest_framework.permissions import IsAuthenticated
@@ -9,6 +10,7 @@ from rest_framework.generics import ListAPIView
 from rest_framework import status
 from .models import *
 from .serializers import *
+from rest_framework.authtoken.models import Token
 
 #First student's tasks:
 class UserCreateView(APIView):
@@ -33,8 +35,24 @@ class UserCreateView(APIView):
         return Response({'id': user.id, 'username': user.username, 'password': user.password, 'email': user.email}, status=status.HTTP_201_CREATED)
         
 
-class LoginView():
-    pass
+class LoginView(APIView):
+    #1.
+    def post(self, request, *args, **kwargs):
+        username = request.data.get('username', None)
+        password = request.data.get('password', None)
+        
+        #2.
+        if not username or not password:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(request, username=username, password=password)
+
+        #3.
+        if user is not None:
+            token, created = Token.objects.get_or_create(user=user)
+            return Response({'token': token.key}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED) 
 
 class LogoutView():
     pass
