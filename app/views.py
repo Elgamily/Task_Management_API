@@ -41,7 +41,7 @@ class LoginView(APIView):
         username = request.data.get('username', None)
         password = request.data.get('password', None)
         
-        #2.
+        #2., 4.
         if not username or not password:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -51,11 +51,21 @@ class LoginView(APIView):
         if user is not None:
             token, created = Token.objects.get_or_create(user=user)
             return Response({'token': token.key}, status=status.HTTP_200_OK)
+        #4.
         else:
             return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED) 
 
-class LogoutView():
-    pass
+class LogoutView(APIView):
+    #1.
+    permission_classes = [IsAuthenticated]
+
+    #2.
+    def post(self, request, *args, **kwargs):
+        #3.
+        request.user.auth_token_delete()
+
+        #4
+        return Response({'message', 'Successfully logged out'}, status=status.HTTP_200_OK)
 
 class TaskCreateView():
     pass
