@@ -11,8 +11,27 @@ from .models import *
 from .serializers import *
 
 #First student's tasks:
-class UserCreateView():
-    pass
+class UserCreateView(APIView):
+    #1.
+    def post(self, request, *args, **kwargs):
+        data = request.data
+        username = data.get('username')
+        password = data.get('password')
+        email = data.get('email')
+
+        #2.
+        if not all([username, password, email]):
+            return Response({'error': 'Username, password and email are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #3
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        #4.
+        user = User.objects.create_user(username=username, password=password, email=email)
+
+        return Response({'id': user.id, 'username': user.username, 'password': user.password, 'email': user.email}, status=status.HTTP_201_CREATED)
+        
 
 class LoginView():
     pass
